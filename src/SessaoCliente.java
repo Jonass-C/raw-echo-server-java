@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class SessaoCliente implements Runnable {
 
@@ -23,8 +24,11 @@ public class SessaoCliente implements Runnable {
             logger.info("Cliente conectado no IP: " + ipCliente);
             print.println("Olá! Seja bem-vindo ao servidor: " + cliente.getLocalPort());
 
+            cliente.setSoTimeout(60000);
             processarRequisicao(ipCliente, reader, print);
 
+        } catch (SocketTimeoutException e) {
+            logger.warning("Cliente " + ipCliente + " desconectado por inatividade!");
         } catch (IOException e) {
             logger.warning("Cliente " + ipCliente + " desconectou de forma abrupta.");
         } finally {
