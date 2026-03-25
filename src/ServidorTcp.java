@@ -14,12 +14,25 @@ public class ServidorTcp {
 
     public static void iniciarServidor() {
         logger.setupLogger();
+        ServerSocket server;
+        ExecutorService executor;
         try {
-            ServerSocket server = new ServerSocket(8080);
+            server = new ServerSocket(8080);
             logger.info("Servidor conectado na porta: " + server.getLocalPort());
             logger.info("Aguardando conexão do cliente...");
 
-            ExecutorService executor = Executors.newFixedThreadPool(2); // fixa 2 para testes
+            executor = Executors.newFixedThreadPool(5);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                logger.info("Iniciando desligamento gracioso do servidor...");
+                try {
+                    server.close();
+                } catch (IOException e) {
+                    logger.error("Erro ao fechar o server.");
+                }
+                executor.shutdown();
+                logger.info("Servidor encerrado com segurança.");
+            }));
+
             while (true) {
                 Socket cliente = server.accept();
                 SessaoCliente sessaoCliente = new SessaoCliente(cliente);
