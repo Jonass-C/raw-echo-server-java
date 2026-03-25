@@ -6,17 +6,18 @@ import java.util.concurrent.Executors;
 
 public class ServidorTcp {
 
-    private static final Logger logger = new Logger();
+    private static final ServidorLog logger = new ServidorLog();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         iniciarServidor();
     }
 
-    public static void iniciarServidor() throws IOException {
+    public static void iniciarServidor() {
+        logger.setupLogger();
         try {
             ServerSocket server = new ServerSocket(8080);
-            System.out.println("[" + logger.timestamp() + "] Servidor conectado na porta: " + server.getLocalPort());
-            System.out.println("[" + logger.timestamp() + "] Aguardando conexão do cliente...");
+            logger.info("Servidor conectado na porta: " + server.getLocalPort());
+            logger.info("Aguardando conexão do cliente...");
 
             ExecutorService executor = Executors.newFixedThreadPool(2); // fixa 2 para testes
             while (true) {
@@ -25,7 +26,7 @@ public class ServidorTcp {
                 executor.execute(sessaoCliente);
             }
         } catch (IOException e) {
-            System.out.println("[" + logger.timestamp() + "] Não foi possível iniciar o servidor: " + e.getCause());
+            logger.warning("Não foi possível iniciar o servidor: " + e.getCause());
         }
     }
 }
